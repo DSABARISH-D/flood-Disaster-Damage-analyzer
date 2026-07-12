@@ -75,6 +75,19 @@ class ObjectDetector:
                 }
             }
         """
+        # Check if model loaded successfully
+        if self.model is None:
+            print("[Detector][ERROR] YOLO model is not loaded. Skipping detection.")
+            return {
+                "detections": [],
+                "annotated_image": image.copy(),
+                "summary": {
+                    "total_objects": 0,
+                    "objects_in_flood": 0,
+                    "by_class": {},
+                },
+            }
+
         # Run YOLO inference
         results = self.model.predict(
             source=image,

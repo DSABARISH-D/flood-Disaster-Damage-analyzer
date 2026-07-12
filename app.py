@@ -13,9 +13,16 @@ import io
 import time
 
 # ── Page Configuration (must be first Streamlit call) ──────
+import base64
+try:
+    with open("logo.png", "rb") as f:
+        logo_b64 = base64.b64encode(f.read()).decode()
+except:
+    logo_b64 = ""
+
 st.set_page_config(
-    page_title="🌊 Disaster Damage Analysis",
-    page_icon="🌊",
+    page_title="Disaster Damage Assessment System",
+    page_icon="logo.png",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -23,48 +30,133 @@ st.set_page_config(
  # ── Custom CSS for Enterprise Disaster Dashboard ─────────────
 st.markdown("""
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
-  :root{--bg:#0B1120;--sidebar:#111827;--card:#1F2937;--accent:#3B82F6;--success:#22C55E;--warn:#F59E0B;--danger:#EF4444;--text:#FFFFFF}
-  html,body,.stApp{background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial}
-  [data-testid="stSidebar"]{background:linear-gradient(180deg,var(--sidebar),#0f1724);padding:18px}
-  .sidebar-logo{display:flex;align-items:center;gap:12px;margin-bottom:10px}
-  .sidebar-logo img{width:48px;height:48px;border-radius:8px}
-  .project-title{font-size:18px;font-weight:800}
-  .muted{color:rgba(255,255,255,0.65);font-size:13px}
-  .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 8px 30px rgba(2,6,23,0.6)}
-  .dashboard-header{display:flex;justify-content:space-between;align-items:center;padding:18px;margin-bottom:18px;border-radius:12px}
-  .dash-title{font-size:22px;font-weight:800}
-  .dash-sub{color:rgba(255,255,255,0.75);font-size:14px}
-  .status-pill{padding:8px 12px;border-radius:999px;font-weight:700;font-size:13px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.03)}
-  .metrics-row{display:flex;gap:12px;margin-bottom:16px}
-  .metric{flex:1;padding:18px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));box-shadow:0 8px 30px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.04)}
-  .metric .icon{font-size:26px;margin-bottom:8px}
-  .metric .value{font-size:28px;font-weight:800}
-  .metric .label{color:rgba(255,255,255,0.72);font-size:13px}
-  .upload-preview{border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.03)}
-  .stTabs [data-baseweb="tab-list"]{gap:8px}
-  .stTabs [data-baseweb="tab"]{background:transparent;border-radius:10px;padding:8px 14px}
-  footer{visibility:hidden}
-    /* KPI / Dashboard styles */
-    .kpi-row{display:flex;gap:14px;margin:18px 0}
-    .kpi{flex:1;padding:18px;border-radius:14px;background:linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));box-shadow:0 12px 30px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.04);min-height:84px}
-    .kpi .label{font-size:13px;color:rgba(255,255,255,0.85);margin-bottom:6px}
-    .kpi .value{font-size:24px;font-weight:800}
-    .kpi .sub{font-size:12px;color:rgba(255,255,255,0.65)}
-    .badge{display:inline-block;padding:6px 10px;border-radius:999px;font-weight:700;font-size:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.04)}
-    .sidebar-nav{margin-bottom:12px}
-    .nav-item{padding:10px 12px;border-radius:8px;margin-bottom:6px;color:rgba(255,255,255,0.85)}
-    .nav-item:hover{background:linear-gradient(90deg, rgba(59,130,246,0.12), rgba(59,130,246,0.06));cursor:pointer}
-    /* KPI color variations */
-    .kpi-blue{background:linear-gradient(135deg,#0ea5e9 0%, #6366f1 100%);color:rgba(255,255,255,0.98)}
-    .kpi-green{background:linear-gradient(135deg,#10b981 0%, #06b6d4 100%);color:rgba(255,255,255,0.98)}
-    .kpi-purple{background:linear-gradient(135deg,#7c3aed 0%, #a78bfa 100%);color:rgba(255,255,255,0.98)}
-    .kpi-orange{background:linear-gradient(135deg,#f97316 0%, #fb923c 100%);color:rgba(255,255,255,0.98)}
-    /* Card headers */
-    .card-header{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.02);margin:-14px -14px 12px -14px}
-    .card-title{font-weight:700;color:rgba(255,255,255,0.92)}
-    .small-badge{background:rgba(0,0,0,0.45);padding:6px 8px;border-radius:8px;font-size:12px;border:1px solid rgba(255,255,255,0.03)}
-    .image-card img{border-radius:8px;border:1px solid rgba(255,255,255,0.03)}
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+  
+  :root {
+      --bg: #F5F7FB;
+      --sidebar: #FFFFFF;
+      --card: #FFFFFF;
+      --accent: #2563EB;
+      --success: #10B981;
+      --warn: #F59E0B;
+      --danger: #EF4444;
+      --text: #111827;
+      --secondary: #6B7280;
+      --border: #E5E7EB;
+  }
+  
+  /* Reset and base styles */
+  html, body, .stApp {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+  }
+  
+  [data-testid="stSidebar"] {
+      background-color: var(--sidebar);
+      border-right: 1px solid var(--border);
+      padding: 18px;
+  }
+  
+  .sidebar-logo { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+  .sidebar-logo img { width:48px; height:48px; border-radius:8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+  .project-title { font-size:18px; font-weight:800; color: var(--text); }
+  .muted { color: var(--secondary); font-size:13px; font-weight:500; }
+  
+  .card {
+      background: var(--card);
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+      color: var(--text);
+      transition: all 0.2s ease;
+  }
+  
+  .dashboard-header {
+      display:flex; justify-content:space-between; align-items:center;
+      padding: 24px; margin-bottom: 24px; border-radius: 16px;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 1);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  }
+  .dash-title { font-size:24px; font-weight:800; color: var(--text); margin-bottom:4px; }
+  .dash-sub { color: var(--secondary); font-size:14px; font-weight:500; }
+  
+  .status-pill {
+      padding:8px 16px; border-radius:999px; font-weight:700; font-size:13px;
+      background: #EFF6FF; color: var(--accent);
+      border: 1px solid #BFDBFE;
+  }
+  
+  .metrics-row { display:flex; gap:16px; margin-bottom:24px; }
+  .metric {
+      flex:1; padding:20px; border-radius:16px; background: var(--card);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.08); border: 1px solid var(--border);
+      text-align: center;
+  }
+  .metric .icon { font-size:28px; margin-bottom:12px; }
+  .metric .value { font-size:32px; font-weight:800; color: var(--accent); }
+  .metric .label { color: var(--secondary); font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; }
+  
+  .upload-preview {
+      border-radius:12px; overflow:hidden; border: 1px solid var(--border);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+  }
+  
+  .stTabs [data-baseweb="tab-list"] { gap:16px; border-bottom:2px solid var(--border); padding-bottom:8px; }
+  .stTabs [data-baseweb="tab"] { background:transparent; border-radius:8px; padding:10px 16px; font-weight:600; color: var(--secondary); }
+  .stTabs [aria-selected="true"] { color: var(--accent) !important; box-shadow: inset 0 -3px 0 0 #EF4444 !important; background: transparent !important; }
+  
+  footer { visibility:hidden; }
+  
+  /* KPI / Dashboard styles */
+  .kpi-row { display:flex; gap:16px; margin:24px 0; }
+  .kpi {
+      flex:1; padding:24px; border-radius:16px; background: var(--card);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.08); border: 1px solid var(--border);
+      min-height:90px;
+  }
+  .kpi .label { font-size:13px; color: var(--secondary); font-weight:700; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px; }
+  .kpi .value { font-size:28px; font-weight:800; color: var(--text); }
+  .kpi .sub { font-size:13px; color: var(--secondary); font-weight:500; margin-top:4px; }
+  
+  .badge { display:inline-block; padding:6px 12px; border-radius:999px; font-weight:700; font-size:12px; border: 1px solid var(--border); background: #F9FAFB; color: var(--text); }
+  
+  .sidebar-nav { margin-bottom:16px; }
+  .nav-item { padding:12px 16px; border-radius:10px; margin-bottom:8px; color: var(--secondary); font-weight:500; transition:all 0.2s; }
+  .nav-item:hover { background: #F3F4F6; color: var(--text); cursor:pointer; }
+  
+  /* KPI color variations */
+  .kpi-blue { border-top: 4px solid var(--accent); }
+  .kpi-green { border-top: 4px solid var(--success); }
+  .kpi-purple { border-top: 4px solid #8B5CF6; }
+  .kpi-orange { border-top: 4px solid var(--warn); }
+  
+  /* Card headers */
+  .card-header { display:flex; justify-content:space-between; align-items:center; padding:16px; border-bottom: 1px solid var(--border); margin:-16px -16px 16px -16px; background: #F9FAFB; border-radius: 16px 16px 0 0; }
+  .card-title { font-weight:700; color: var(--text); font-size:15px; }
+  .small-badge { background: #FFFFFF; padding:6px 10px; border-radius:8px; font-size:12px; border: 1px solid var(--border); color: var(--text); font-weight:600; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+  
+  .image-card img { border-radius:12px; border: 1px solid var(--border); box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
+  
+  /* Streamlit native overrides */
+  div[data-testid="stButton"] button {
+      border-radius: 12px !important;
+      font-weight: 600 !important;
+      border: 1px solid var(--border) !important;
+      transition: all 0.2s ease !important;
+  }
+  div[data-testid="stButton"] button[kind="primary"] {
+      background-color: var(--accent) !important;
+      color: #FFFFFF !important;
+      border: none !important;
+  }
+  div[data-testid="stButton"] button:hover {
+      box-shadow: 0 8px 16px rgba(0,0,0,0.08) !important;
+      transform: translateY(-1px) !important;
+  }
 </style>
 """, unsafe_allow_html=True)
 
@@ -129,15 +221,12 @@ with st.sidebar:
     # Sidebar header with logo
     col1, col2 = st.columns([0.2, 0.8])
     with col1:
-        st.image("https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/Emoji/objects/waving-hand.png", width=48)
+        st.markdown(f"<img src='data:image/png;base64,{logo_b64}' style='width:56px; height:56px; border-radius:50%; background:white; padding:4px; box-shadow:0 4px 12px rgba(0,0,0,0.08); object-fit:contain;'/>", unsafe_allow_html=True)
     with col2:
         st.markdown("<div class='project-title'>🌊 Disaster Damage Analysis</div>", unsafe_allow_html=True)
         st.markdown("<div class='muted'>Emergency Response Dashboard</div>", unsafe_allow_html=True)
 
-    # Navigation
-    st.markdown("<div class='sidebar-nav'>", unsafe_allow_html=True)
-    nav = st.radio("Navigation", ["Dashboard", "Upload Image", "Analysis History", "Reports", "Map View", "Alerts"], index=0, label_visibility='collapsed')
-    st.markdown("</div>", unsafe_allow_html=True)
+    # Navigation (Removed)
 
     st.markdown("---")
 
@@ -159,41 +248,21 @@ with st.sidebar:
 
     st.markdown("---")
 
-    # Settings
-    st.markdown("**Settings**")
-    confidence_threshold = st.slider("Classification Confidence", min_value=0.1, max_value=0.9, value=0.5, step=0.05)
-    yolo_confidence = st.slider("Detection Confidence", min_value=0.1, max_value=0.9, value=0.35, step=0.05)
-
-    st.markdown("**Location (Optional)**")
-    col_lat, col_lon = st.columns(2)
-    with col_lat:
-        lat = st.number_input("Latitude", value=20.5937, format="%.4f", key="lat_input")
-    with col_lon:
-        lon = st.number_input("Longitude", value=78.9629, format="%.4f", key="lon_input")
-    use_location = st.checkbox("Use GPS coordinates", value=False)
-
-    # Status
-    try:
-        import torch
-        gpu_status = 'GPU' if torch.cuda.is_available() else 'CPU'
-    except Exception:
-        gpu_status = 'Unknown'
-    st.markdown(f"**Compute:** {gpu_status}  ")
-    models_loaded = st.session_state.get('models_loaded', False)
-    st.markdown(f"**Models Loaded:** {'Yes' if models_loaded else 'No'}")
+    # Hardcoded variables
+    confidence_threshold = 0.5
+    yolo_confidence = 0.35
+    lat = 20.5937
+    lon = 78.9629
+    use_location = False
 
 
 # ── Header ────────────────────────────────────────────────
-st.markdown("""
-<div class='dashboard-header card'>
+st.markdown(f"""
+<div class='dashboard-header card' style='justify-content:flex-start; gap:16px;'>
+    <img src='data:image/png;base64,{logo_b64}' style='width:48px; height:48px; border-radius:50%; background:white; padding:3px; box-shadow:0 2px 8px rgba(0,0,0,0.05); object-fit:contain;'/>
     <div style='display:flex;flex-direction:column'>
-        <div class='dash-title'>🌊 Disaster Damage Assessment</div>
-        <div class='dash-sub'>AI-driven flood detection, segmentation, and damage assessment</div>
-    </div>
-    <div style='text-align:right'>
-        <div class='muted'>""" + time.strftime('%Y-%m-%d %H:%M') + """</div>
-        <div style='height:8px'></div>
-        <div class='status-pill'>System: Online &nbsp;•&nbsp; Models: """ + ("Loaded" if st.session_state.get('models_loaded') else "Not Loaded") + """</div>
+        <div class='dash-title'>Disaster Damage Assessment System</div>
+        <div class='dash-sub'>AI-powered Flood Detection, Segmentation and Damage Assessment</div>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -383,7 +452,7 @@ elif st.session_state["pipeline_complete"]:
                     img_name = st.session_state['uploaded_image'].name
                 except Exception:
                     img_name = ''
-                    st.image(preprocessed['display'], width='stretch', caption=img_name)
+                st.image(preprocessed['display'], width='stretch', caption=img_name)
                 st.markdown("</div>", unsafe_allow_html=True)
 
             with col_s:
@@ -530,15 +599,27 @@ elif st.session_state["pipeline_complete"]:
         with tab4:
             if assessment:
                 # Severity badge
-                category = assessment["damage_category"]
-                severity = assessment["severity_score"]
-                emoji = assessment["damage_category_emoji"]
-                css_class = f"severity-{category.lower()}"
+                sev_dict = assessment.get("severity", {})
+                category = sev_dict.get("category", "Unknown")
+                severity = sev_dict.get("score", 0.0)
+                emoji = sev_dict.get("emoji", "⚠️")
+                
+                # Raw outputs
+                flood_raw = assessment.get("flood_area_percentage", 0.0)
+                obs = assessment.get("objects_by_class", {})
+                bldgs = obs.get("building", 0)
+                roads = obs.get("road", 0)
+                vehicles = obs.get("vehicle", 0)
+                trees = obs.get("tree", 0)
+                total_objects = assessment.get("total_objects", 0)
+                objects_in_flood = assessment.get("objects_in_flood", 0)
+                other = total_objects - bldgs - roads - vehicles - trees
+                if other < 0: other = 0
 
                 st.markdown(f"""
-                <div style="text-align: center; margin: 20px 0;">
-                    <span class="severity-badge {css_class}">
-                        {emoji} {category} — Score: {severity}/10
+                <div style="text-align:center; padding:10px 0 20px 0;">
+                    <span class="status-pill severity-{category.lower()}" style="font-size:1.1rem; padding:6px 16px;">
+                        {emoji} {category} Risk
                     </span>
                 </div>
                 """, unsafe_allow_html=True)
@@ -547,11 +628,14 @@ elif st.session_state["pipeline_complete"]:
 
                 # Key metrics row
                 mcols = st.columns(4)
+                
+                cls_conf = classification.get("confidence", 0.0) if 'classification' in locals() and classification else 0.85
+                
                 metrics = [
-                    ("Flood Coverage", f"{assessment['flood_area_percentage']:.1f}%"),
-                    ("Objects Detected", str(assessment["total_objects_detected"])),
-                    ("In Flood Zone", str(assessment["objects_in_flood_zone"])),
-                    ("Severity Score", f"{severity}/10"),
+                    ("Total Objects", str(total_objects)),
+                    ("Buildings Detected", str(bldgs)),
+                    ("Roads Blocked", str(roads)),
+                    ("AI Confidence", f"{cls_conf*100:.1f}%"),
                 ]
                 for mcol, (label, value) in zip(mcols, metrics):
                     with mcol:
@@ -562,55 +646,85 @@ elif st.session_state["pipeline_complete"]:
                         </div>
                         """, unsafe_allow_html=True)
 
+                st.markdown("<br>", unsafe_allow_html=True)
+                gcol1, gcol2 = st.columns(2)
+                with gcol1:
+                    st.markdown("**Damage Score Gauge (0-10)**")
+                    st.progress(severity / 10.0)
+                    st.caption(f"Score: {severity}/10")
+                with gcol2:
+                    st.markdown("**Flood Area Progress Bar**")
+                    st.progress(flood_raw / 100.0)
+                    st.caption(f"Coverage: {flood_raw:.1f}%")
+
+                if total_objects == 0:
+                    st.info("No buildings or infrastructure detected.")
+                if flood_raw == 0:
+                    st.info("No flood region identified.")
+
                 st.divider()
 
-                # Score breakdown
-                col1, col2 = st.columns([1, 1])
+                # Calculate specific heuristic scores for table
+                w_flood, w_bldgs, w_roads, w_vehicles, w_trees, w_other = 0.40, 0.30, 0.10, 0.10, 0.05, 0.05
+                s_flood = min((flood_raw ** 0.6) * 1.25, 10.0) if flood_raw > 0 else 0.0
+                s_bldgs = min(bldgs * 1.5, 10.0)
+                s_roads = min(roads * 2.0, 10.0)
+                s_vehicles = min(vehicles * 1.0, 10.0)
+                s_trees = min(trees * 0.5, 10.0)
+                s_other = min(other * 0.2, 10.0)
+
+                c_flood = s_flood * w_flood
+                c_bldgs = s_bldgs * w_bldgs
+                c_roads = s_roads * w_roads
+                c_vehicles = s_vehicles * w_vehicles
+                c_trees = s_trees * w_trees
+                c_other = s_other * w_other
+
+                # Create chart using plotly
+                col1, col2 = st.columns([1, 1.2])
                 with col1:
                     st.markdown("#### Score Breakdown")
-                    from utils.visualization import generate_score_breakdown_chart
-                    chart = generate_score_breakdown_chart(assessment["score_breakdown"])
-                    if chart:
-                        st.image(chart, width='stretch')
+                    values = [c_flood, c_bldgs, c_roads, c_vehicles, c_trees, c_other]
+                    labels = ["Flood Area", "Buildings", "Roads", "Vehicles", "Trees", "Other Objects"]
+                    v_f = [v for v in values if v > 0]
+                    l_f = [l for v, l in zip(values, labels) if v > 0]
+                    
+                    if sum(v_f) == 0:
+                        v_f = [1]
+                        l_f = ["No Damage"]
+                    
+                    import plotly.express as px
+                    fig = px.pie(values=v_f, names=l_f, hole=0.6)
+                    fig.update_layout(margin=dict(t=0, b=0, l=0, r=0), height=300, showlegend=False, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+                    fig.update_traces(textposition='inside', textinfo='percent+label', marker=dict(colors=["#3388ff", "#51cf66", "#ff6b35", "#ffd43b", "#845ef7", "#20c997"]))
+                    st.plotly_chart(fig, width='stretch')
 
                 with col2:
                     st.markdown("#### Breakdown Details")
-                    bd = assessment["score_breakdown"]
                     import pandas as pd
-                    bd_data = [
-                        {
-                            "Component": "Flood Area",
-                            "Raw": f"{bd['flood_area']['raw']}%",
-                            "Score": f"{bd['flood_area']['score']}/10",
-                            "Weight": f"{bd['flood_area']['weight']:.0%}",
-                            "Contribution": bd['flood_area']['contribution'],
-                        },
-                        {
-                            "Component": "Structures",
-                            "Raw": str(bd['affected_structures']['count']),
-                            "Score": f"{bd['affected_structures']['score']}/10",
-                            "Weight": f"{bd['affected_structures']['weight']:.0%}",
-                            "Contribution": bd['affected_structures']['contribution'],
-                        },
-                        {
-                            "Component": "Object Types",
-                            "Raw": "—",
-                            "Score": f"{bd['object_types']['score']}/10",
-                            "Weight": f"{bd['object_types']['weight']:.0%}",
-                            "Contribution": bd['object_types']['contribution'],
-                        },
-                    ]
-                    st.dataframe(pd.DataFrame(bd_data), width='stretch', hide_index=True)
+                    bd_data = []
+                    if flood_raw > 0: bd_data.append({"Component": "Flood Area", "AI Output": f"{flood_raw:.1f}%", "Score": f"{s_flood:.1f}/10", "Weight": "40%", "Contribution": round(c_flood, 2)})
+                    if bldgs > 0: bd_data.append({"Component": "Buildings", "AI Output": str(bldgs), "Score": f"{s_bldgs:.1f}/10", "Weight": "30%", "Contribution": round(c_bldgs, 2)})
+                    if roads > 0: bd_data.append({"Component": "Roads", "AI Output": str(roads), "Score": f"{s_roads:.1f}/10", "Weight": "10%", "Contribution": round(c_roads, 2)})
+                    if vehicles > 0: bd_data.append({"Component": "Vehicles", "AI Output": str(vehicles), "Score": f"{s_vehicles:.1f}/10", "Weight": "10%", "Contribution": round(c_vehicles, 2)})
+                    if trees > 0: bd_data.append({"Component": "Trees", "AI Output": str(trees), "Score": f"{s_trees:.1f}/10", "Weight": "5%", "Contribution": round(c_trees, 2)})
+                    if other > 0: bd_data.append({"Component": "Other Objects", "AI Output": str(other), "Score": f"{s_other:.1f}/10", "Weight": "5%", "Contribution": round(c_other, 2)})
+                    
+                    if not bd_data:
+                        st.info("No damage components to display.")
+                    else:
+                        st.dataframe(pd.DataFrame(bd_data), width='stretch', hide_index=True)
 
                 # Recommendations
                 st.divider()
                 st.markdown("#### 📋 Recommendations")
                 recs = assessment.get("recommendations", [])
                 for rec in recs:
-                    priority = rec["priority"].lower()
+                    priority = rec.get("priority", "INFO").lower()
+                    action = rec.get("action", "")
                     st.markdown(f"""
                     <div class="rec-card rec-{priority}">
-                        <strong>[{rec['priority']}]</strong> {rec['action']}
+                        <strong>[{priority.upper()}]</strong> {action}
                     </div>
                     """, unsafe_allow_html=True)
 
