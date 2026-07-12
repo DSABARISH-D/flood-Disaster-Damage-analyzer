@@ -1,0 +1,23 @@
+services:
+  # 1. FastAPI Backend (Python)
+  - type: web
+    name: flood-assessment-backend
+    env: python
+    region: oregon
+    plan: starter # PyTorch models require memory, consider 'standard' if OOM crashes occur
+    buildCommand: "pip install -r hackathon_backend/requirements.txt && pip install -r ai_module/requirements.txt"
+    startCommand: "uvicorn hackathon_backend.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
+
+  # 2. React Frontend (Static Site)
+  - type: web
+    name: flood-assessment-frontend
+    env: node
+    region: oregon
+    buildCommand: "cd frontend && npm install && npm run build"
+    startCommand: "cd frontend && npm run preview"
+    # Alternatively, you can deploy this as a 'static' site on Render pointing to the 'frontend/dist' folder.

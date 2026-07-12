@@ -1,0 +1,53 @@
+# ── Flood Damage Assessment ────────────────────────────────
+
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+env/
+
+# Environment
+.env
+.env.local
+.env.production
+
+# AI Model Weights (large files)
+ai_weights/**/*.pt
+ai_weights/**/*.pth
+ai_weights/**/*.bin
+ai_weights/**/*.safetensors
+!ai_weights/.gitkeep
+!ai_weights/README.md
+
+# Build output
+frontend/dist/
+frontend/build/
+backend/*.egg-info/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Test
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Uploads / temp
+uploads/
+temp/
+*.tmp

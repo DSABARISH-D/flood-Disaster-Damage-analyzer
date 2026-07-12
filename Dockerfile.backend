@@ -1,0 +1,34 @@
+# Use Python 3.10 slim image for a smaller footprint
+FROM python:3.10-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies required for OpenCV and ReportLab
+RUN apt-get update && apt-get install -y \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy backend requirements and install Python dependencies
+# (Assuming requirements are at hackathon_backend/requirements.txt)
+COPY hackathon_backend/requirements.txt ./
+# We also need AI module requirements
+COPY ai_module/requirements.txt ./ai_requirements.txt
+
+# Install dependencies (combined)
+RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r ai_requirements.txt
+
+# Copy all the required Python modules from the root
+COPY ai_module/ ./ai_module/
+COPY opencv_module/ ./opencv_module/
+COPY assessment_engine/ ./assessment_engine/
+COPY hackathon_backend/ ./hackathon_backend/
+
+# Expose FastAPI port
+EXPOSE 8000
+
+# Run Uvicorn from the hackathon_backend package
+CMD ["uvicorn", "hackathon_backend.main:app", "--host", "0.0.0.0", "--port", "8000"]

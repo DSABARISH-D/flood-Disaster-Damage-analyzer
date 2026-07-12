@@ -1,0 +1,11 @@
+fastapi>=0.110.0
+uvicorn[standard]>=0.27.0
+python-multipart>=0.0.9
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+opencv-python-headless>=4.8.0
+Pillow>=10.0.0
+s u p a b a s e > = 2 . 3 . 0  
+reportlab>=4.0.0
+qrcode>=7.4.2
+ 
